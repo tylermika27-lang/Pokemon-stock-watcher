@@ -1,38 +1,36 @@
 {
-  "Pokemon Center": {
-    "status": 200,
-    "bytes": 1042,
-    "watch_terms": [],
-    "availability_terms": [],
-    "href_count": 0,
-    "product_path_count": 0,
-    "json_script_count": 0
+  "Early Warnings": {
+    "seen_ids": [
+      "t3_1v7f2mz",
+      "t3_1v7fjo4",
+      "t3_1v7fsua",
+      "t3_1v7htpp",
+      "t3_1v7izg5",
+      "t3_1v7lcru",
+      "t3_1v7nxpg",
+      "t3_1v7patr",
+      "t3_1v7vv7v",
+      "t3_1v82qxm",
+      "t3_1v88ggw",
+      "t3_1v8a7iq",
+      "t3_1v8fews",
+      "t3_1v8ha03",
+      "t3_1v8ka85",
+      "t3_1v8rg1q",
+      "t3_1v8vees",
+      "t3_1v8whpj",
+      "t3_1v93sfx",
+      "t3_1v93slc",
+      "t3_1v9704d",
+      "t3_1v9b4c5",
+      "t3_1v9fka6",
+      "t3_1v9fy6l",
+      "t3_1v9kwkc"
+    ]
   },
   "Target": {
-    "status": 200,
-    "bytes": 135212,
-    "watch_terms": [
-      "pokemon",
-      "etb",
-      "upc",
-      "tin",
-      "collection"
-    ],
-    "availability_terms": [
-      "add",
-      "available"
-    ],
-    "href_count": 80,
-    "product_path_count": 0,
-    "json_script_count": 1
-  },
-  "Walmart": {
-    "status": 412,
-    "bytes": 396,
-    "watch_terms": [],
-    "availability_terms": [],
-    "href_count": 0,
-    "product_path_count": 0,
-    "json_script_count": 0
+    "count": 0,
+    "products": {},
+    "status": "working"
   }
 }
