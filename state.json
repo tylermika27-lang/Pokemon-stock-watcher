@@ -1,5 +1,38 @@
 {
+  "Pokemon Center": {
+    "status": 200,
+    "bytes": 1042,
+    "watch_terms": [],
+    "availability_terms": [],
+    "href_count": 0,
+    "product_path_count": 0,
+    "json_script_count": 0
+  },
   "Target": {
-    "urls": []
+    "status": 200,
+    "bytes": 135212,
+    "watch_terms": [
+      "pokemon",
+      "etb",
+      "upc",
+      "tin",
+      "collection"
+    ],
+    "availability_terms": [
+      "add",
+      "available"
+    ],
+    "href_count": 80,
+    "product_path_count": 0,
+    "json_script_count": 1
+  },
+  "Walmart": {
+    "status": 412,
+    "bytes": 396,
+    "watch_terms": [],
+    "availability_terms": [],
+    "href_count": 0,
+    "product_path_count": 0,
+    "json_script_count": 0
   }
 }
