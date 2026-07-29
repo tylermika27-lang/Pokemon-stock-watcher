@@ -1,13 +1,14 @@
 import os
+import json
 import re
-from urllib.parse import urljoin
+from pathlib import Path
 
 import requests
 
 DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
+DEBUG_FILE = Path("target_debug.json")
 
 TARGET_URL = "https://www.target.com/s?searchTerm=pokemon+cards"
-TARGET_BASE = "https://www.target.com"
 
 HEADERS = {
     "User-Agent": (
@@ -17,19 +18,6 @@ HEADERS = {
     ),
     "Accept-Language": "en-US,en;q=0.9",
 }
-
-POKEMON_TERMS = [
-    "pokemon",
-    "pokémon",
-    "elite trainer box",
-    "booster",
-    "bundle",
-    "collection",
-    "tin",
-    "blister",
-    "upc",
-    "ultra-premium",
-]
 
 
 def send_discord(message):
@@ -54,63 +42,54 @@ def main():
 
     html = response.text
 
-    links = re.findall(
-        r'href=["\']([^"\']+)["\']',
+    scripts = re.findall(
+        r'<script[^>]*type=["\']application/(?:ld\+json|json)["\'][^>]*>(.*?)</script>',
         html,
-        flags=re.IGNORECASE,
+        flags=re.IGNORECASE | re.DOTALL,
     )
 
-    found = []
+    results = []
 
-    for raw_link in links:
-        url = urljoin(TARGET_BASE, raw_link)
+    for index, script in enumerate(scripts):
+        raw = script.strip()
 
-        if "/p/" not in url.lower():
-            continue
+        try:
+            parsed = json.loads(raw)
 
-        match = re.search(
-            re.escape(raw_link),
-            html,
-            flags=re.IGNORECASE,
-        )
+            results.append(
+                {
+                    "index": index,
+                    "valid_json": True,
+                    "data": parsed,
+                }
+            )
 
-        if not match:
-            continue
+        except Exception:
+            results.append(
+                {
+                    "index": index,
+                    "valid_json": False,
+                    "preview": raw[:5000],
+                }
+            )
 
-        start = max(0, match.start() - 1000)
-        end = min(len(html), match.end() + 1000)
+    DEBUG_FILE.write_text(
+        json.dumps(results, indent=2),
+        encoding="utf-8",
+    )
 
-        context = html[start:end].lower()
+    pokemon_hits = html.lower().count("pokemon")
+    add_to_cart_hits = html.lower().count("add to cart")
 
-        if not any(
-            term in context
-            for term in POKEMON_TERMS
-        ):
-            continue
-
-        if url not in found:
-            found.append(url)
-
-    if found:
-        lines = [
-            "🧪 **TARGET RADAR TEST**",
-            "",
-            f"✅ Detector found {len(found)} Target product links.",
-            "",
-        ]
-
-        for url in found[:8]:
-            lines.append(f"🎯 {url}")
-
-        send_discord("\n\n".join(lines))
-
-    else:
-        send_discord(
-            "❌ **TARGET RADAR TEST FAILED**\n\n"
-            "Target page loaded, but the detector found "
-            "ZERO qualifying product links.\n\n"
-            "Do NOT trust the Target monitor yet."
-        )
+    send_discord(
+        "🧪 **TARGET JSON DIAGNOSTIC**\n\n"
+        f"HTTP: {response.status_code}\n"
+        f"Page bytes: {len(response.content)}\n"
+        f"JSON scripts found: {len(scripts)}\n"
+        f"'pokemon' occurrences: {pokemon_hits}\n"
+        f"'add to cart' occurrences: {add_to_cart_hits}\n\n"
+        "Saved Target JSON to `target_debug.json`."
+    )
 
 
 if __name__ == "__main__":
