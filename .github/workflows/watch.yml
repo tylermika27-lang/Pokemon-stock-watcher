@@ -6,6 +6,9 @@ on:
   schedule:
     - cron: "*/5 * * * *"
 
+permissions:
+  contents: write
+
 jobs:
   pokemon-radar:
     runs-on: ubuntu-latest
@@ -26,3 +29,11 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: python watcher.py
+
+      - name: Save radar state
+        run: |
+          git config user.name "Pokemon Stock Radar"
+          git config user.email "actions@github.com"
+          git add state.json
+          git diff --cached --quiet || git commit -m "Update radar state"
+          git push
