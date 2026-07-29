@@ -2,15 +2,17 @@ import os
 import json
 import re
 from pathlib import Path
-from urllib.parse import urljoin
 
 import requests
 
 DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
 STATE_FILE = Path("state.json")
 
-TARGET_URL = "https://www.target.com/s?searchTerm=pokemon+cards"
-TARGET_BASE = "https://www.target.com"
+SOURCES = {
+    "Pokemon Center": "https://www.pokemoncenter.com/category/trading-card-game",
+    "Target": "https://www.target.com/s?searchTerm=pokemon+cards",
+    "Walmart": "https://www.walmart.com/browse/collectibles/pokemon-cards/5967908_9807313_4252400",
+}
 
 HEADERS = {
     "User-Agent": (
@@ -18,180 +20,166 @@ HEADERS = {
         "AppleWebKit/605.1.15 (KHTML, like Gecko) "
         "Version/18.0 Mobile/15E148 Safari/604.1"
     ),
+    "Accept": "text/html,application/xhtml+xml,application/json",
     "Accept-Language": "en-US,en;q=0.9",
 }
 
-PRODUCT_TERMS = [
+WATCH_TERMS = [
     "pokemon",
     "pokémon",
+    "tcg",
     "elite trainer box",
     "etb",
-    "booster",
+    "booster bundle",
+    "booster box",
+    "booster pack",
     "ultra-premium",
     "ultra premium",
     "upc",
-    "collection",
+    "mini tin",
     "tin",
     "blister",
-    "battle box",
-]
-
-HIGH_PRIORITY_TERMS = [
+    "collection",
     "151",
     "prismatic",
     "30th",
     "celebration",
-    "elite trainer box",
-    "ultra-premium",
-    "ultra premium",
-    "upc",
+    "pitch black",
+]
+
+AVAILABILITY_TERMS = [
+    "add to cart",
+    "add",
+    "in stock",
+    "preorder",
+    "pre-order",
+    "available",
+    "out of stock",
+    "sold out",
 ]
 
 
 def send_discord(message):
     if not DISCORD_WEBHOOK:
-        raise RuntimeError("DISCORD_WEBHOOK secret is missing.")
+        return
 
-    response = requests.post(
+    r = requests.post(
         DISCORD_WEBHOOK,
         json={"content": message[:1900]},
         timeout=20,
     )
-    response.raise_for_status()
+    r.raise_for_status()
 
 
-def load_state():
-    if not STATE_FILE.exists():
-        return {}
-
-    try:
-        return json.loads(
-            STATE_FILE.read_text(encoding="utf-8")
-        )
-    except Exception:
-        return {}
-
-
-def save_state(state):
-    STATE_FILE.write_text(
-        json.dumps(state, indent=2, sort_keys=True),
-        encoding="utf-8",
-    )
-
-
-def fetch_target():
-    response = requests.get(
-        TARGET_URL,
+def fetch(url):
+    r = requests.get(
+        url,
         headers=HEADERS,
         timeout=30,
+        allow_redirects=True,
     )
-    response.raise_for_status()
-    return response.text
+    return r
 
 
-def looks_like_pokemon(text):
-    lowered = text.lower()
-    return (
-        ("pokemon" in lowered or "pokémon" in lowered)
-        and any(term in lowered for term in PRODUCT_TERMS)
-    )
+def normalize(text):
+    text = text.replace("\\u0026", "&")
+    text = text.replace("\\/", "/")
+    text = re.sub(r"\s+", " ", text)
+    return text.lower()
 
 
-def priority_score(text):
-    lowered = text.lower()
-    return sum(
-        1
-        for term in HIGH_PRIORITY_TERMS
-        if term in lowered
-    )
+def inspect_page(name, url):
+    try:
+        response = fetch(url)
 
+        text = normalize(response.text)
 
-def extract_target_products(html):
-    products = {}
+        found_watch_terms = [
+            term for term in WATCH_TERMS
+            if term in text
+        ]
 
-    # Target product URLs typically contain /p/
-    links = re.findall(
-        r'href=["\']([^"\']*/p/[^"\']+)["\']',
-        html,
-        flags=re.IGNORECASE,
-    )
+        found_availability_terms = [
+            term for term in AVAILABILITY_TERMS
+            if term in text
+        ]
 
-    for raw_link in links:
-        url = urljoin(TARGET_BASE, raw_link)
-
-        match = re.search(
-            re.escape(raw_link),
-            html,
-            flags=re.IGNORECASE,
+        href_count = len(
+            re.findall(
+                r'href=["\'][^"\']+["\']',
+                response.text,
+                flags=re.I,
+            )
         )
 
-        if match:
-            start = max(0, match.start() - 500)
-            end = min(len(html), match.end() + 500)
-            context = html[start:end]
-        else:
-            context = url
+        product_path_count = len(
+            re.findall(
+                r'/(?:p|ip|product)/[^"\'> ]+',
+                response.text,
+                flags=re.I,
+            )
+        )
 
-        text = re.sub(r"\s+", " ", context)
+        json_script_count = len(
+            re.findall(
+                r'<script[^>]+type=["\']application/(?:ld\+json|json)["\']',
+                response.text,
+                flags=re.I,
+            )
+        )
 
-        if not looks_like_pokemon(text):
-            continue
-
-        products[url] = {
-            "url": url,
-            "priority": priority_score(text),
+        return {
+            "status": response.status_code,
+            "bytes": len(response.content),
+            "watch_terms": found_watch_terms,
+            "availability_terms": found_availability_terms,
+            "href_count": href_count,
+            "product_path_count": product_path_count,
+            "json_script_count": json_script_count,
         }
 
-    return products
+    except Exception as e:
+        return {
+            "error": f"{type(e).__name__}: {e}"
+        }
 
 
 def main():
-    previous = load_state()
+    results = {}
 
-    html = fetch_target()
-    products = extract_target_products(html)
+    for name, url in SOURCES.items():
+        results[name] = inspect_page(name, url)
 
-    current_urls = set(products.keys())
-    old_urls = set(
-        previous.get("Target", {}).get("urls", [])
+    STATE_FILE.write_text(
+        json.dumps(results, indent=2),
+        encoding="utf-8",
     )
 
-    new_urls = current_urls - old_urls
+    lines = [
+        "🧪 **POKÉMON RETAILER DIAGNOSTIC**",
+        "",
+    ]
 
-    state = {
-        "Target": {
-            "urls": sorted(current_urls)
-        }
-    }
+    for retailer, info in results.items():
+        if "error" in info:
+            lines.append(
+                f"❌ **{retailer}** — {info['error']}"
+            )
+            continue
 
-    # First real Target scan = baseline only
-    if "Target" not in previous:
-        print(f"Target baseline: {len(current_urls)} products")
-        save_state(state)
-        return
+        lines.append(
+            f"**{retailer}**"
+            f"\nHTTP: {info['status']}"
+            f"\nPage bytes: {info['bytes']}"
+            f"\nLinks: {info['href_count']}"
+            f"\nProduct paths: {info['product_path_count']}"
+            f"\nJSON scripts: {info['json_script_count']}"
+            f"\nWatch terms: {len(info['watch_terms'])}"
+            f"\nAvailability terms: {len(info['availability_terms'])}"
+            "\n"
+        )
 
-    if new_urls:
-        ranked = sorted(
-            [products[url] for url in new_urls],
-            key=lambda x: x["priority"],
-            reverse=True,
-        )[:8]
-
-        lines = [
-            "🚨 **TARGET POKÉMON ALERT** 🚨",
-            "",
-        ]
-
-        for item in ranked:
-            marker = "🔥" if item["priority"] > 0 else "🟢"
-            lines.append(f"{marker} {item['url']}")
-
-        send_discord("\n".join(lines))
-
-    print(f"Target products detected: {len(current_urls)}")
-    print(f"New Target products: {len(new_urls)}")
-
-    save_state(state)
+    send_discord("\n".join(lines))
 
 
 if __name__ == "__main__":
