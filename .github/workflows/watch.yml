@@ -34,6 +34,7 @@ jobs:
         run: |
           git config user.name "Pokemon Stock Radar"
           git config user.email "actions@github.com"
-          git add state.json target_debug.json 2>/dev/null || true
+          git add state.json
           git diff --cached --quiet || git commit -m "Update radar state"
+          git pull --rebase
           git push
