@@ -222,7 +222,7 @@
     ]
   },
   "Target": {
-    "count": 363,
+    "count": 360,
     "status": "working",
     "urls": [
       "https://www.target.com/p/2023-pokemon-crown-zenith-premium-treasures-morpeko-v-union-box-trading-cards/-/A-94681703",
@@ -265,6 +265,7 @@
       "https://www.target.com/p/pokemon-card-game-hot-wind-arena-booster-pack-japanese-3-packs-15-cards-total/-/A-1003487926",
       "https://www.target.com/p/pokemon-card-game-hot-wind-arena-booster-pack-japanese-5-cards/-/A-1003298516",
       "https://www.target.com/p/pokemon-card-game-mega-evolution-storm-emeralda-booster-pack-5-cards/-/A-1013459560",
+      "https://www.target.com/p/pokemon-card-game-mega-expansion-pack-30th-celebration-booster-pack-japanese-6-cards/-/A-1014685282",
       "https://www.target.com/p/pokemon-card-game-mega-expansion-pack-abyss-eye-booster-pack/-/A-1011826760",
       "https://www.target.com/p/pokemon-card-game-mega-inferno-x-booster-box-japanese-30-packs/-/A-1006040030",
       "https://www.target.com/p/pokemon-card-game-mega-symphonia-booster-box-japanese-30-packs/-/A-1005449310",
@@ -462,9 +463,6 @@
       "https://www.target.com/p/pokemon-tcg-booster-box-cbb2c-vol-2-gem-pack-chinese/-/A-1006604650",
       "https://www.target.com/p/pokemon-tcg-charizard-ex-premium-collection/-/A-1010851944",
       "https://www.target.com/p/pokemon-tcg-chinese-30th-anniversary-celebration-first-partner-vol-1/-/A-1010896077",
-      "https://www.target.com/p/pokemon-tcg-dark-powers-ex-special-collection/-/A-93763175",
-      "https://www.target.com/p/pokemon-tcg-greninja-ex-battle-deck-ready-to-play-60-card-deck/-/A-90512140",
-      "https://www.target.com/p/pokemon-tcg-hisuian-electrode-v-box/-/A-90589775",
       "https://www.target.com/p/pokemon-tcg-holo-rare-value-pack-12-cards/-/A-1009003208",
       "https://www.target.com/p/pokemon-tcg-kangaskhan-ex-battle-deck-ready-to-play-60-card-deck/-/A-90517612",
       "https://www.target.com/p/pokemon-tcg-lumiose-city-mini-tin-display-10-mini-tins/-/A-1011832856",
@@ -496,7 +494,6 @@
       "https://www.target.com/p/pokemon-tcg-s4a-sword-shield-shiny-star-v-booster-pack-japanese-version/-/A-1003404383",
       "https://www.target.com/p/pokemon-tcg-s6a-sword-shield-eevee-heroes-booster-pack-5-pack-japanese-version/-/A-1005486948",
       "https://www.target.com/p/pokemon-tcg-s8a-sword-shield-25th-anniversary-collection-booster-pack-japanese-version/-/A-1003404375",
-      "https://www.target.com/p/pokemon-tcg-scarlet-and-violet-temporal-forces-elite-trainer-box-iron-leaves/-/A-1001539511",
       "https://www.target.com/p/pokemon-tcg-scarlet-and-violet-temporal-forces-sleeved-booster-pack-8-packs/-/A-1001539806",
       "https://www.target.com/p/pokemon-tcg-scarlet-violet-151-mini-tin-electabuzz-and-magnemite-2-booster-packs-1-coin-1-art-card/-/A-1011937034",
       "https://www.target.com/p/pokemon-tcg-scarlet-violet-151-mini-tin-gengar-and-poliwag-2-booster-packs-1-coin-1-art-card/-/A-1003082645",
@@ -591,8 +588,17 @@
     ]
   },
   "Walmart": {
-    "count": 0,
+    "count": 8,
     "status": "working",
-    "urls": []
+    "urls": [
+      "https://www.walmart.com/browse/feature/pokemon-detective-pikachu-trading-cards/best-rated/14503_5177183_9550449_3580439_5129776_1598759/Y3VzdG9tZXJfcmF0aW5nOjQgLSA1IFN0YXJz",
+      "https://www.walmart.com/browse/feature/pokemon-trainer-box/best-rated/14503_3195517_1964194_3580439_5500001_4252400_9331354/Y3VzdG9tZXJfcmF0aW5nOjQgLSA1IFN0YXJz",
+      "https://www.walmart.com/browse/toys/pokemon-all-trading-cards/best-rated/4171_7357538_9574778_4252400_9497398/Y3VzdG9tZXJfcmF0aW5nOjQgLSA1IFN0YXJz",
+      "https://www.walmart.com/ip/Fantasy-North-Elements-I-Fire-100-Textured-Matte-TCG-Card-Sleeves-Fits-Magic-MTG-Commander-Pokemon-Card-Games-Playing-Card-Sleeves/12179664150",
+      "https://www.walmart.com/ip/Gallery-Pops-Pokemon-Bulbasaur-Evolutions-Wall-Art-Bundle-3-Pack/5204868496",
+      "https://www.walmart.com/ip/Gallery-Pops-Pokemon-Pikachu-Wall-Art-Bundle-3-Pack/5198558507",
+      "https://www.walmart.com/ip/Pokemon-Center-Sitting-Cuties-Grotle-Plush-388-Generation-4-6-In/1160129133",
+      "https://www.walmart.com/ip/Pokemon-Center-Sitting-Cuties-Toxicroak-Plush-454-Generation-4-6-In/1094723004"
+    ]
   }
 }
